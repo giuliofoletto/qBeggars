@@ -21,6 +21,7 @@ def h2(x):
 # Compute the holevo quantity (see 10.1103/PhysRevLett.98.230501)
 def holevo(s):
     arg = 0.5*(1+np.sqrt((s/2)**2-1))
+    return h2(arg)
 
 # find the positions in which arrayA differs from arrayB
 def error_finder(arrayA, arrayB, maskA = None, maskB = None):
@@ -30,5 +31,5 @@ def error_finder(arrayA, arrayB, maskA = None, maskB = None):
         maskB = np.ones(arrayB.size, dtype = bool)
     if arrayA[maskA].size != arrayB[maskB].size:
         raise ValueError("Array sizes do not match")
-    errors = (arrayA[maksA] != arrayB[maskB])
+    errors = (arrayA[maskB] != arrayB[maskB])
     return errors
