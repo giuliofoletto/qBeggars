@@ -18,7 +18,7 @@ correct_keyB = []
 #bits_alice = []    (apparently) useless (from BB84.py)
 received_alice = []
 #bits_bob = []      (apparently) useless (from BB84.py)
-basis_bob = [] 
+basis_bob = []
 received_bob = []
 modes_alice = []
 
@@ -31,15 +31,16 @@ angA_2 = 128
 def preparation_Alice():
     with CQCConnection("Alice") as Alice:
         for i in range(100):
-            #q = Alice.recvQubit()
+            q = Alice.recvQubit()
             sleep(0.01)
-            rnd_mode_choice = Alice.recvClassical()
+            rnd_mode_choice = int.from_bytes(Alice.recvClassical(), 'big')
+            print ("ciao:", rnd_mode_choice)
             modes_alice.append(rnd_mode_choice)
             if rnd_mode_choice == 1:
                 print ("Key generation mode selected")
                 #complete with key mode actions
 
-                q = Alice.recvQubit() 
+                #q = Alice.recvQubit()
                 basis_alice.append(0)               #key test on basis Z
                 a = q.measure()
                 if a == 0:
@@ -52,8 +53,8 @@ def preparation_Alice():
             if rnd_mode_choice == 0:
                 print ("Control mode selected")
                 #complete with control mode actions
-                
-                q = Alice.recvQubit()                  #input is an (entangeld))qubit
+
+                #q = Alice.recvQubit()                  #input is an (entangeld))qubit
                 random_basis_alice = randint(0,1)
                 basis_alice.append(random_basis_alice)
 

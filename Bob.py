@@ -24,7 +24,7 @@ def preparation_Bob():
         p_control_mode = 0.1
         p_key_mode = 1-p_control_mode
         for i in range(100):
-            #q = Bob.recvQubit()
+            q = Bob.recvQubit()
             rnd_mode_choice = int((copysign(1,(random()-p_control_mode))+1)/2) #copysign used to get +1 or -1 but never 0, then we need to turn those into positive values (0 or 1) to send them
             Bob.sendClassical("Alice", rnd_mode_choice)
             modes_bob.append(rnd_mode_choice)
@@ -33,7 +33,7 @@ def preparation_Bob():
                 print ("Key generation mode selected")
                 #complete with key mode actions
 
-                q = Bob.recvQubit() 
+                #q = Bob.recvQubit()
                 basis_bob.append(2)               #key test on basis Z (flag "2")
                 a = q.measure()
                 if a == 0:
@@ -47,7 +47,7 @@ def preparation_Bob():
                 print ("Control mode selected")
                 #complete with control mode actions
 
-                q = Bob.recvQubit()
+                #q = Bob.recvQubit()
                 random_basis_bob = randint(0,1)
                 basis_bob.append(random_basis_bob)
 
@@ -71,10 +71,10 @@ def preparation_Bob():
                     else:
                         print ("Error: measure != {0,1}")
 
-                #Abasis = Bob.recvClassical()
-                #basis_alice.append(Abasis)
-                #Ameasure = Bob.recvClassical()
-                #received_alice.append(Ameasure)
+            Abasis = Bob.recvClassical()
+            basis_alice.append(Abasis)
+            Ameasure = Bob.recvClassical()
+            received_alice.append(Ameasure)
 
 
     print ("basis of Bob ", basis_bob)
@@ -82,7 +82,7 @@ def preparation_Bob():
     print ("modes of Bob ", modes_bob)
 
 
-def calculate(): 
+def calculate():
     error = 0
     for i in range(len(received_alice)):
         if (basis_alice[i] == basis_bob[i]):
@@ -90,15 +90,15 @@ def calculate():
             correct_keyA.append(received_alice[i])
             correct_keyB.append(received_bob[i])
         else:
-            error = error + 1  
-    print ("Correct Basis: ", correct_basis)        
+            error = error + 1
+    print ("Correct Basis: ", correct_basis)
     print ("Correct Key Alice:", correct_keyA)
     print ("Correct Key Bob:", correct_keyB)
     print ("error: ", error)
     error_percentage = error/len(received_alice) # maximum value is 1
     print("error_percentage: ", error_percentage)
     size = ceil(sqrt(len(correct_basis)))
-    print ("size: ", size) 
+    print ("size: ", size)
     global qber
     global qber2
     qber = error_percentage/size # lies btween 0 and 1
