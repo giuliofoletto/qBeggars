@@ -8,6 +8,7 @@ from time import sleep
 
 with CQCConnection("Charlie") as Charlie:
     for i in range(100):
+        #print(i)
         # Create two qubits
         qalice = qubit(Charlie)
         qbob = qubit(Charlie)

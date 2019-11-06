@@ -8,10 +8,15 @@ import numpy as np
 def compute_CHSH(alice_bases, alice_outcomes, bob_bases, bob_outcomes):
     outcomes = alice_outcomes*bob_outcomes
     a0b0 = np.mean(outcomes[np.logical_and(alice_bases == 0, bob_bases == 0)])
+    print(len(outcomes[np.logical_and(alice_bases == 0, bob_bases == 0)]))
     a0b1 = np.mean(outcomes[np.logical_and(alice_bases == 0, bob_bases == 1)])
+    print(len(outcomes[np.logical_and(alice_bases == 0, bob_bases == 1)]))
     a1b0 = np.mean(outcomes[np.logical_and(alice_bases == 1, bob_bases == 0)])
+    print(len(outcomes[np.logical_and(alice_bases == 1, bob_bases == 0)]))
     a1b1 = np.mean(outcomes[np.logical_and(alice_bases == 1, bob_bases == 1)])
-    s = a0b0 + a0b1 + a1b0 - a1b1
+    print(len(outcomes[np.logical_and(alice_bases == 1, bob_bases == 1)]))
+    print(a0b0,a0b1,a1b0,a1b1)
+    s = a0b0 - a0b1 + a1b0 + a1b1
     return s
 
 # Compute the binary entropy

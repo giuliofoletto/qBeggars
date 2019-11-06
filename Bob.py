@@ -4,6 +4,8 @@ from random import randint, random, sample
 from multiprocessing import Pool
 from cqc.pythonLib import CQCConnection, qubit
 from time import sleep
+import utils
+import numpy as np
 
 correct_basis = []
 correct_keyA = []
@@ -16,15 +18,16 @@ received_alice = []
 received_bob = []
 modes_bob = []
 
-angB_1 = 64
-angB_2 = 192
+angB_1 = 0
+angB_2 = 64
 
 def preparation_Bob():
     with CQCConnection("Bob") as Bob:
-        p_control_mode = 0.1
+        p_control_mode = 1
         p_key_mode = 1-p_control_mode
         for i in range(100):
-            q = Bob.recvQubit()
+            print(i)
+            q = Bob.createEPR("Alice")
             sleep(0.01)
             rnd_mode_choice = int((copysign(1,(random()-p_control_mode))+1)/2) #copysign used to get +1 or -1 but never 0, then we need to turn those into positive values (0 or 1) to send them
             Bob.sendClassical("Alice", rnd_mode_choice)
@@ -72,16 +75,19 @@ def preparation_Bob():
                     else:
                         print ("Error: measure != {0,1}")
             sleep(0.01)
-            Abasis = Bob.recvClassical()
+            Abasis = int.from_bytes(Bob.recvClassical(),"big")
             sleep(0.01)
             basis_alice.append(Abasis)
-            Ameasure = Bob.recvClassical()
+            Ameasure = int.from_bytes(Bob.recvClassical(),"big")-1
             received_alice.append(Ameasure)
 
 
     print ("basis of Bob ", basis_bob)
     print ("measures of Bob ", received_bob)
     print ("modes of Bob ", modes_bob)
+    print ("basis of Alice ", basis_alice)
+    print ("measures of Alice ", received_alice)
+
 
 
 def calculate():
@@ -131,3 +137,9 @@ def calculate():
 
 
 preparation_Bob()
+basis_alice = np.array(basis_alice,dtype=int)
+received_alice = np.array(received_alice,dtype=int)
+basis_bob = np.array(basis_bob,dtype=int)
+received_bob = np.array(received_bob,dtype=int)
+S=utils.compute_CHSH(basis_alice, received_alice,basis_bob, received_bob)
+print(S)

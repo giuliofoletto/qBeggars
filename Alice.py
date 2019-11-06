@@ -22,8 +22,8 @@ basis_bob = []
 received_bob = []
 modes_alice = []
 
-angA_1 = 0
-angA_2 = 128
+angA_1 = 224
+angA_2 = 32
 
 
 
@@ -31,13 +31,13 @@ angA_2 = 128
 def preparation_Alice():
     with CQCConnection("Alice") as Alice:
         for i in range(100):
-            q = Alice.recvQubit()
+            q = Alice.recvEPR()
             sleep(0.01)
             rnd_mode_choice = int.from_bytes(Alice.recvClassical(), 'big')
             print ("ciao:", rnd_mode_choice)
             modes_alice.append(rnd_mode_choice)
             if rnd_mode_choice == 1:
-                print ("Key generation mode selected")
+                #print ("Key generation mode selected")
                 #complete with key mode actions
 
                 #q = Alice.recvQubit()
@@ -51,7 +51,7 @@ def preparation_Alice():
                     print ("Error: measure != {0,1}")
 
             if rnd_mode_choice == 0:
-                print ("Control mode selected")
+                #print ("Control mode selected")
                 #complete with control mode actions
 
                 #q = Alice.recvQubit()                  #input is an (entangeld))qubit
@@ -82,8 +82,6 @@ def preparation_Alice():
             sleep(0.01)
             Alice.sendClassical("Bob", received_alice[i]+1)
 
-    print ("basis of Alice ", basis_alice)
-    print ("measures of Alice ", received_alice)
     print ("modes of Alice ", modes_alice)
 
 preparation_Alice()
