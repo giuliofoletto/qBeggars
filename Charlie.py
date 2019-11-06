@@ -16,6 +16,5 @@ with CQCConnection("Charlie") as Charlie:
         qalice.cnot(qbob)
 
         # send the qubits
-        Charlie.sendQubit("Alice", qalice)
-        Charlie.sendQubit("Bob", qbob)
-
+        Charlie.sendQubit(qalice,"Alice")
+        Charlie.sendQubit( qbob,"Bob")
