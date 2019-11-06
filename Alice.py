@@ -41,7 +41,7 @@ def preparation_Alice():
                 #complete with key mode actions
 
                 #q = Alice.recvQubit()
-                basis_alice.append(0)               #key test on basis Z
+                basis_alice.append(2)               #key test on basis Z
                 a = q.measure()
                 if a == 0:
                     received_alice.append(+1)
@@ -77,7 +77,9 @@ def preparation_Alice():
                         received_alice.append(-1)
                     else:
                         print ("Error: measure != {0,1}")
+            sleep(0.01)
             Alice.sendClassical("Bob", basis_alice[i])
+            sleep(0.01)
             Alice.sendClassical("Bob", received_alice[i]+1)
 
     print ("basis of Alice ", basis_alice)
