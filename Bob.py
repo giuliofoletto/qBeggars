@@ -6,11 +6,13 @@ from cqc.pythonLib import CQCConnection, qubit
 from time import sleep
 
 correct_basis = []
-correct_key = []
+correct_keyA = []
+correct_keyB = []
 bits_alice = []
 basis_alice = []
 bits_bob = []
 basis_bob = []
+received_alice = []
 received_bob = []
 modes_bob = []
 
@@ -31,8 +33,8 @@ def preparation_Bob():
                 print ("Key generation mode selected")
                 #complete with key mode actions
 
-                q = Bob.recvEPR() 
-                basis_bob.append(2)               #key test on basis Z
+                q = Bob.recvQubit() 
+                basis_bob.append(2)               #key test on basis Z (flag "2")
                 a = q.measure()
                 if a == 0:
                     received_bob.append(+1)
@@ -45,7 +47,7 @@ def preparation_Bob():
                 print ("Control mode selected")
                 #complete with control mode actions
 
-                q = Bob.recvEPR()
+                q = Bob.recvQubit()
                 random_basis_bob = randint(0,1)
                 basis_bob.append(random_basis_bob)
 
@@ -69,11 +71,38 @@ def preparation_Bob():
                     else:
                         print ("Error: measure != {0,1}")
 
+                Abasis = Bob.recvClassical()
+                basis_alice.append(Abasis)
+                Ameasure = Bob.recvClassical()
+                received_alice.append(Ameasure)
+
+
     print ("basis of Bob ", basis_bob)
     print ("measures of Bob ", received_bob)
     print ("modes of Bob ", modes_bob)
 
 
+def calculate(): 
+    error = 0
+    for i in range(len(received_alice)):
+        if (basis_alice[i] == basis_bob[i]):
+            correct_basis.append(i)
+            correct_keyA.append(received_alice[i])
+            correct_keyB.append(received_bob[i])
+        else:
+            error = error + 1  
+    print ("Correct Basis: ", correct_basis)        
+    print ("Correct Key Alice:", correct_keyA)
+    print ("Correct Key Bob:", correct_keyB)
+    print ("error: ", error)
+    error_percentage = error/len(received_alice) # maximum value is 1
+    print("error_percentage: ", error_percentage)
+    size = ceil(sqrt(len(correct_basis)))
+    print ("size: ", size) 
+    global qber
+    global qber2
+    qber = error_percentage/size # lies btween 0 and 1
+    print("qber:", qber)
 
 #def calculate():
  #   error = 0
