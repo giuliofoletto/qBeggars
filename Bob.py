@@ -23,9 +23,9 @@ angB_2 = 64
 
 def preparation_Bob():
     with CQCConnection("Bob") as Bob:
-        p_control_mode = 1
+        p_control_mode = 0.5
         p_key_mode = 1-p_control_mode
-        for i in range(100):
+        for i in range(20):
             print(i)
             q = Bob.recvQubit()
             sleep(0.01)
@@ -74,12 +74,14 @@ def preparation_Bob():
                         received_bob.append(-1)
                     else:
                         print ("Error: measure != {0,1}")
-            sleep(0.01)
-            Abasis = int.from_bytes(Bob.recvClassical(),"big")
-            sleep(0.01)
-            basis_alice.append(Abasis)
-            Ameasure = int.from_bytes(Bob.recvClassical(),"big")-1
-            received_alice.append(Ameasure)
+        for i in range(20):  
+            if modes_bob[i] == 0:              
+                sleep(0.01)
+                Abasis = int.from_bytes(Bob.recvClassical(),"big")
+                basis_alice.append(Abasis)
+                sleep(0.01)
+                Ameasure = int.from_bytes(Bob.recvClassical(),"big")-1
+                received_alice.append(Ameasure)
 
 
     print ("basis of Bob ", basis_bob)
@@ -141,5 +143,6 @@ basis_alice = np.array(basis_alice,dtype=int)
 received_alice = np.array(received_alice,dtype=int)
 basis_bob = np.array(basis_bob,dtype=int)
 received_bob = np.array(received_bob,dtype=int)
-S=utils.compute_CHSH(basis_alice, received_alice,basis_bob, received_bob)
+modes_bob = np.array(modes_bob,dtype=int)
+S=utils.compute_CHSH(basis_alice, received_alice, basis_bob[modes_bob == 0], received_bob[modes_bob == 0])
 print(S)

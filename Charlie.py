@@ -7,7 +7,7 @@ from cqc.pythonLib import CQCConnection, qubit
 from time import sleep
 
 with CQCConnection("Charlie") as Charlie:
-    for i in range(100):
+    for i in range(20):
         #print(i)
         # Create two qubits
         qalice = qubit(Charlie)

@@ -34,14 +34,13 @@ def preparation_Alice():
             q = Alice.recvQubit()
             sleep(0.01)
             rnd_mode_choice = int.from_bytes(Alice.recvClassical(), 'big')
-            print ("ciao:", rnd_mode_choice)
             modes_alice.append(rnd_mode_choice)
             if rnd_mode_choice == 1:
                 #print ("Key generation mode selected")
                 #complete with key mode actions
 
                 #q = Alice.recvQubit()
-                basis_alice.append(2)               #key test on basis Z
+                basis_alice.append(0)               #key test on basis Z
                 a = q.measure()
                 if a == 0:
                     received_alice.append(+1)
@@ -77,11 +76,12 @@ def preparation_Alice():
                         received_alice.append(-1)
                     else:
                         print ("Error: measure != {0,1}")
-            sleep(0.01)
-            Alice.sendClassical("Bob", basis_alice[i])
-            sleep(0.01)
-            Alice.sendClassical("Bob", received_alice[i]+1)
-
-    print ("modes of Alice ", modes_alice)
+        for i in range(20):
+            if modes_alice[i] == 0:
+                sleep(0.01)
+                Alice.sendClassical("Bob", basis_alice[i])
+                sleep(0.01)
+                Alice.sendClassical("Bob", received_alice[i]+1) 
+        print ("modes of Alice ", modes_alice)           
 
 preparation_Alice()
