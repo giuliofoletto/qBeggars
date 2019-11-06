@@ -16,8 +16,8 @@ received_alice = []
 received_bob = []
 modes_bob = []
 
-angB_1 = 90
-angB_2 = 270
+angB_1 = 64
+angB_2 = 192
 
 def preparation_Bob():
     with CQCConnection("Bob") as Bob:

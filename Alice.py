@@ -23,7 +23,7 @@ received_bob = []
 modes_alice = []
 
 angA_1 = 0
-angA_2 = 180
+angA_2 = 128
 
 
 
@@ -53,7 +53,7 @@ def preparation_Alice():
                 print ("Control mode selected")
                 #complete with control mode actions
                 
-                q = Alice.recvQubit()                  #input is an EPR qubit
+                q = Alice.recvQubit()                  #input is an (entangeld))qubit
                 random_basis_alice = randint(0,1)
                 basis_alice.append(random_basis_alice)
 
@@ -76,8 +76,8 @@ def preparation_Alice():
                         received_alice.append(-1)
                     else:
                         print ("Error: measure != {0,1}")
-            Alice.sendClassical("Bob", random_basis_alice)
-            Alice.sendClassical("Bob", received_alice[i])
+            Alice.sendClassical("Bob", basis_alice[i])
+            Alice.sendClassical("Bob", received_alice[i]+1)
 
     print ("basis of Alice ", basis_alice)
     print ("measures of Alice ", received_alice)
