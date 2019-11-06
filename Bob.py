@@ -20,6 +20,8 @@ basis_bob = []
 received_alice = []
 received_bob = []
 modes_bob = []
+KGM_mesures_alice =[]
+KGM_mesures_bob =[]
 
 angB_1 = 0
 angB_2 = 64
@@ -79,14 +81,31 @@ def preparation_Bob():
                         received_bob.append(-1)
                     else:
                         print ("Error: measure != {0,1}")
-        for i in range(clenght):
-            if modes_bob[i] == 0:
+        KGM_mesures_bob = []                
+        for i in range(clenght):  
+            if modes_bob[i] == 0:              
                 sleep(0.01)
                 Abasis = int.from_bytes(Bob.recvClassical(),"big")
                 basis_alice.append(Abasis)
                 sleep(0.01)
                 Ameasure = int.from_bytes(Bob.recvClassical(),"big")-1
                 received_alice.append(Ameasure)
+            else:
+                KGM_mesures_bob.append(received_bob[i]+1)
+        KGM_mesures_alice = Bob.recvClassical()
+        print (KGM_mesures_alice)
+        #for i in range(len(KGM_mesures_alice)):
+        #    KGM_mesures_alice[i] = int.from_bytes(KGM_mesures_alice[i], "big")
+        #index = Bob.recvClassical()
+        #for i in range(len(index)):
+        #    index[i] = int.from_bytes(index[i], "big")
+        #KGM_mesures_bob = KGM_mesures_bob[index]
+
+        #A_array = np.asarray(KGM_mesures_alice)
+        #B_array = np.asarray(KGM_mesures_bob)
+        #utils.error_finder(A_array,B_array)
+
+        
 
 
     print ("basis of Bob ", basis_bob)

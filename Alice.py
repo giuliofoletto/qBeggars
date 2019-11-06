@@ -6,6 +6,8 @@ from cqc.pythonLib import CQCConnection, qubit
 from time import sleep
 from tkinter import *
 import json
+import numpy as np
+
 
 
 bits_alice = []
@@ -22,6 +24,8 @@ received_alice = []
 basis_bob = []
 received_bob = []
 modes_alice = []
+KGM_mesures_alice = []
+KGM_mesures_alice_official = []
 
 angA_1 = 224
 angA_2 = 32
@@ -82,8 +86,21 @@ def preparation_Alice():
                 sleep(0.01)
                 Alice.sendClassical("Bob", basis_alice[i])
                 sleep(0.01)
-                Alice.sendClassical("Bob", received_alice[i]+1)
-        print ("modes of Alice ", modes_alice)
+                Alice.sendClassical("Bob", received_alice[i]+1) 
+            else:
+                KGM_mesures_alice.append(received_alice[i]+1)
+        index = np.random.choice(len(KGM_mesures_alice),10,replace=False)
+        indexlist = list(index)
+        KGM_mesures_alice_list = list(KGM_mesures_alice)
+        print(indexlist)
+        for i in range(KGM_mesures_alice):
+            if i in indexlist:
+                KGM_mesures_alice_official.append(KGM_mesures_alice[i])
+        KGM_mesures_alice_official_list = list(KGM_mesures_alice_official)
+        Alice.sendClassical("Bob", KGM_mesures_alice_official_list)
+        #Alice.sendClassical("Bob", index)   
+
+        print ("modes of Alice ", modes_alice)           
 
 preparation_Alice()
 

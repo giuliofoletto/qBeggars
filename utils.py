@@ -36,5 +36,5 @@ def error_finder(arrayA, arrayB, maskA = None, maskB = None):
         maskB = np.ones(arrayB.size, dtype = bool)
     if arrayA[maskA].size != arrayB[maskB].size:
         raise ValueError("Array sizes do not match")
-    errors = (arrayA[maskB] != arrayB[maskB])
+    errors = (arrayA[maskA] != arrayB[maskB])
     return errors
