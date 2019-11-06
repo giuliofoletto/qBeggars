@@ -27,7 +27,7 @@ def preparation_Bob():
         p_key_mode = 1-p_control_mode
         for i in range(100):
             print(i)
-            q = Bob.createEPR("Alice")
+            q = Bob.recvQubit()
             sleep(0.01)
             rnd_mode_choice = int((copysign(1,(random()-p_control_mode))+1)/2) #copysign used to get +1 or -1 but never 0, then we need to turn those into positive values (0 or 1) to send them
             Bob.sendClassical("Alice", rnd_mode_choice)

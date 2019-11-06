@@ -31,7 +31,7 @@ angA_2 = 32
 def preparation_Alice():
     with CQCConnection("Alice") as Alice:
         for i in range(100):
-            q = Alice.recvEPR()
+            q = Alice.recvQubit()
             sleep(0.01)
             rnd_mode_choice = int.from_bytes(Alice.recvClassical(), 'big')
             print ("ciao:", rnd_mode_choice)
