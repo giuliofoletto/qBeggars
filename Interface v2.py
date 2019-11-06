@@ -1,4 +1,5 @@
-from Tkinter import *
+from tkinter import *
+import Charlie
 
 alice = Tk()
 bob = Tk()
@@ -43,10 +44,9 @@ sent_bin_label.pack()
 send_button = Button( alice, text="SEND!", width=10, command=callback )
 send_button.pack()
 
+#BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB-BOB
 
 receive_label = Label( bob, text = "Bob didn't receive anything" )
 receive_label.pack()
-
-alice.mainloop()
 
 bob.mainloop()

@@ -4,7 +4,7 @@ from random import randint, random, sample
 from multiprocessing import pool
 from cqc.pythonLib import CQCConnection, qubit
 from time import sleep
-
+from tkinter import *
 
 
 bits_alice = []
@@ -26,8 +26,6 @@ angA_1 = 224
 angA_2 = 32
 
 clenght = 100
-
-
 
 
 def preparation_Alice():
@@ -83,7 +81,49 @@ def preparation_Alice():
                 sleep(0.01)
                 Alice.sendClassical("Bob", basis_alice[i])
                 sleep(0.01)
-                Alice.sendClassical("Bob", received_alice[i]+1) 
-        print ("modes of Alice ", modes_alice)           
+                Alice.sendClassical("Bob", received_alice[i]+1)
+        print ("modes of Alice ", modes_alice)
 
 preparation_Alice()
+
+#INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE
+
+alice = Tk()
+
+alice.title( "QBeggars - Alice" )
+
+message = StringVar()
+message.set(" ")
+sent = StringVar()
+sent.set(" ")
+
+send_label = Label( alice, text = "Insert a message you want to send securely" )
+send_label.pack()
+
+entry = Entry(alice, bd = 5, textvariable = message)
+entry.pack(fill=X)
+
+#establish QKD and update Bob label
+def QBeggars():
+    aggiunta = "Arrivato"
+    received = message.get() + aggiunta
+    receive_label.config( text = received )
+
+#update labels and calls QBeggars when 'SEND!' is pressed
+def callback():
+    QBeggars()
+    sent_bin = ''.join( format(ord(i), 'b') for i in message.get() )
+    sent_label.config( text = message.get() )
+    sent_bin_label.config( text = sent_bin )
+    entry.delete( first = 0, last = 100 )
+
+
+sent_label = Label( alice, text = "Alice didn't send anything" )
+sent_label.pack()
+sent_bin_label = Label( alice, text = "Alice didn't send anything but in binary" )
+sent_bin_label.pack()
+send_button = Button( alice, text="SEND!", width=10, command=callback )
+send_button.pack()
+
+
+alice.mainloop()

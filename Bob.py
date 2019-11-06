@@ -6,6 +6,8 @@ from cqc.pythonLib import CQCConnection, qubit
 from time import sleep
 import utils
 import numpy as np
+from tkinter import *
+
 
 correct_basis = []
 correct_keyA = []
@@ -76,8 +78,8 @@ def preparation_Bob():
                         received_bob.append(-1)
                     else:
                         print ("Error: measure != {0,1}")
-        for i in range(clenght):  
-            if modes_bob[i] == 0:              
+        for i in range(clenght):
+            if modes_bob[i] == 0:
                 sleep(0.01)
                 Abasis = int.from_bytes(Bob.recvClassical(),"big")
                 basis_alice.append(Abasis)
@@ -148,3 +150,14 @@ received_bob = np.array(received_bob,dtype=int)
 modes_bob = np.array(modes_bob,dtype=int)
 S=utils.compute_CHSH(basis_alice, received_alice, basis_bob[modes_bob == 0], received_bob[modes_bob == 0])
 print(S)
+
+
+#INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE
+
+bob = Tk()
+bob.title( "QBeggars - Bob" )
+
+receive_label = Label( bob, text = "Bob didn't receive anything" )
+receive_label.pack()
+
+bob.mainloop()
