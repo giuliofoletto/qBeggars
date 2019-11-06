@@ -5,6 +5,7 @@ from multiprocessing import pool
 from cqc.pythonLib import CQCConnection, qubit
 from time import sleep
 from tkinter import *
+import json
 
 
 bits_alice = []
@@ -104,18 +105,20 @@ entry = Entry(alice, bd = 5, textvariable = message)
 entry.pack(fill=X)
 
 #establish QKD and update Bob label
-def QBeggars():
-    aggiunta = "Arrivato"
-    received = message.get() + aggiunta
-    receive_label.config( text = received )
+def QBeggars(s):
+    sent_bin_j = json.dumps(s).encode('utf-8')
+
+    with CQCConnection("Alice") as Alice:
+        Alice.sendClassical("Bob", sent_bin_j)
+        print("Alice SENT: ", sent_bin_j)
 
 #update labels and calls QBeggars when 'SEND!' is pressed
 def callback():
-    QBeggars()
-    sent_bin = ''.join( format(ord(i), 'b') for i in message.get() )
+    #sent_bin = ''.join( format(ord(i), 'b') for i in message.get() )
     sent_label.config( text = message.get() )
-    sent_bin_label.config( text = sent_bin )
+    #sent_bin_label.config( text = sent_bin )
     entry.delete( first = 0, last = 100 )
+    QBeggars(message.get())
 
 
 sent_label = Label( alice, text = "Alice didn't send anything" )

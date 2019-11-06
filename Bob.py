@@ -7,6 +7,7 @@ from time import sleep
 import utils
 import numpy as np
 from tkinter import *
+import json
 
 
 correct_basis = []
@@ -154,9 +155,16 @@ print(S)
 
 #INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE
 
+
+with CQCConnection("Bob") as Bob:
+    received_j = Bob.recvClassical(msg_size=10000)
+    measure_outcome = json.loads(received_j.decode('utf-8'))
+    print("FAK")
+    type(measure_outcome)
+
+
 bob = Tk()
 bob.title( "QBeggars - Bob" )
-
 receive_label = Label( bob, text = "Bob didn't receive anything" )
 receive_label.pack()
 
