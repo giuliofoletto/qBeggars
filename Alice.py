@@ -25,12 +25,14 @@ modes_alice = []
 angA_1 = 224
 angA_2 = 32
 
+clenght = 100
+
 
 
 
 def preparation_Alice():
     with CQCConnection("Alice") as Alice:
-        for i in range(100):
+        for i in range(clenght):
             q = Alice.recvQubit()
             sleep(0.01)
             rnd_mode_choice = int.from_bytes(Alice.recvClassical(), 'big')
@@ -76,7 +78,7 @@ def preparation_Alice():
                         received_alice.append(-1)
                     else:
                         print ("Error: measure != {0,1}")
-        for i in range(20):
+        for i in range(clenght):
             if modes_alice[i] == 0:
                 sleep(0.01)
                 Alice.sendClassical("Bob", basis_alice[i])

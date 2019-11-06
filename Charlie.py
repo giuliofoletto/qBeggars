@@ -2,12 +2,14 @@
 The Charlie (source) node for the qBeggar project
 '''
 
+clenght = 100
+
 import sys
 from cqc.pythonLib import CQCConnection, qubit
 from time import sleep
 
 with CQCConnection("Charlie") as Charlie:
-    for i in range(20):
+    for i in range(clenght):
         #print(i)
         # Create two qubits
         qalice = qubit(Charlie)

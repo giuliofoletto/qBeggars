@@ -21,11 +21,13 @@ modes_bob = []
 angB_1 = 0
 angB_2 = 64
 
+clenght = 100
+
 def preparation_Bob():
     with CQCConnection("Bob") as Bob:
         p_control_mode = 0.5
         p_key_mode = 1-p_control_mode
-        for i in range(20):
+        for i in range(clenght):
             print(i)
             q = Bob.recvQubit()
             sleep(0.01)
@@ -74,7 +76,7 @@ def preparation_Bob():
                         received_bob.append(-1)
                     else:
                         print ("Error: measure != {0,1}")
-        for i in range(20):  
+        for i in range(clenght):  
             if modes_bob[i] == 0:              
                 sleep(0.01)
                 Abasis = int.from_bytes(Bob.recvClassical(),"big")
