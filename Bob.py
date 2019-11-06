@@ -71,10 +71,10 @@ def preparation_Bob():
                     else:
                         print ("Error: measure != {0,1}")
 
-                Abasis = Bob.recvClassical()
-                basis_alice.append(Abasis)
-                Ameasure = Bob.recvClassical()
-                received_alice.append(Ameasure)
+                #Abasis = Bob.recvClassical()
+                #basis_alice.append(Abasis)
+                #Ameasure = Bob.recvClassical()
+                #received_alice.append(Ameasure)
 
 
     print ("basis of Bob ", basis_bob)
