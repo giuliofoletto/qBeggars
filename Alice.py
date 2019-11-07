@@ -86,21 +86,23 @@ def preparation_Alice():
                 sleep(0.01)
                 Alice.sendClassical("Bob", basis_alice[i])
                 sleep(0.01)
-                Alice.sendClassical("Bob", received_alice[i]+1) 
+                Alice.sendClassical("Bob", received_alice[i]+1)
             else:
                 KGM_mesures_alice.append(received_alice[i]+1)
         index = np.random.choice(len(KGM_mesures_alice),10,replace=False)
         indexlist = list(index)
-        KGM_mesures_alice_list = list(KGM_mesures_alice)
         print(indexlist)
-        for i in range(KGM_mesures_alice):
+        i=0
+        while i < len(KGM_mesures_alice):
             if i in indexlist:
                 KGM_mesures_alice_official.append(KGM_mesures_alice[i])
-        KGM_mesures_alice_official_list = list(KGM_mesures_alice_official)
-        Alice.sendClassical("Bob", KGM_mesures_alice_official_list)
-        #Alice.sendClassical("Bob", index)   
+            i += 1
 
-        print ("modes of Alice ", modes_alice)           
+        print("KGM Measures Sent: ", KGM_mesures_alice_official)
+        Alice.sendClassical("Bob", KGM_mesures_alice_official)
+
+        #Alice.sendClassical("Bob", index)
+        #print ("modes of Alice ", modes_alice)
 
 preparation_Alice()
 
@@ -123,7 +125,8 @@ entry.pack(fill=X)
 
 #establish QKD and update Bob label
 def QBeggars(s):
-    sent_bin_j = json.dumps(s).encode('utf-8')
+    sent_bin_j = s.encode('utf-8')
+    print("Stringa da inviare in binario: ", sent_bin_j)
 
     with CQCConnection("Alice") as Alice:
         Alice.sendClassical("Bob", sent_bin_j)

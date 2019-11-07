@@ -81,9 +81,9 @@ def preparation_Bob():
                         received_bob.append(-1)
                     else:
                         print ("Error: measure != {0,1}")
-        KGM_mesures_bob = []                
-        for i in range(clenght):  
-            if modes_bob[i] == 0:              
+        KGM_mesures_bob = []
+        for i in range(clenght):
+            if modes_bob[i] == 0:
                 sleep(0.01)
                 Abasis = int.from_bytes(Bob.recvClassical(),"big")
                 basis_alice.append(Abasis)
@@ -92,8 +92,15 @@ def preparation_Bob():
                 received_alice.append(Ameasure)
             else:
                 KGM_mesures_bob.append(received_bob[i]+1)
+        sleep(0.01)
         KGM_mesures_alice = Bob.recvClassical()
-        print (KGM_mesures_alice)
+        print ("KGM Measures Received: ", list(KGM_mesures_alice))
+        print ("pluto: ", int.from_bytes(KGM_mesures_alice, "big"))
+
+
+
+
+
         #for i in range(len(KGM_mesures_alice)):
         #    KGM_mesures_alice[i] = int.from_bytes(KGM_mesures_alice[i], "big")
         #index = Bob.recvClassical()
@@ -105,7 +112,7 @@ def preparation_Bob():
         #B_array = np.asarray(KGM_mesures_bob)
         #utils.error_finder(A_array,B_array)
 
-        
+
 
 
     print ("basis of Bob ", basis_bob)
