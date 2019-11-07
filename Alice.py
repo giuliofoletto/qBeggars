@@ -125,7 +125,9 @@ entry.pack(fill=X)
 
 #establish QKD and update Bob label
 def QBeggars(s):
-    sent_bin_j = s.encode('utf-8')
+    print("ciò che arriva dalla casella", s)
+    sent_bin_j = ' '.join(format(ord(x), 'b') for x in s)
+
     print("Stringa da inviare in binario: ", sent_bin_j)
 
     with CQCConnection("Alice") as Alice:
@@ -134,11 +136,12 @@ def QBeggars(s):
 
 #update labels and calls QBeggars when 'SEND!' is pressed
 def callback():
+    message_read = message.get()
     #sent_bin = ''.join( format(ord(i), 'b') for i in message.get() )
-    sent_label.config( text = message.get() )
+    sent_label.config( text = message_read )
     #sent_bin_label.config( text = sent_bin )
     entry.delete( first = 0, last = 100 )
-    QBeggars(message.get())
+    QBeggars(message_read)
 
 
 sent_label = Label( alice, text = "Alice didn't send anything" )
