@@ -22,6 +22,7 @@ received_bob = []
 modes_bob = []
 KGM_mesures_alice =[]
 KGM_mesures_bob =[]
+index = []
 
 angB_1 = 0
 angB_2 = 64
@@ -94,8 +95,12 @@ def preparation_Bob():
                 KGM_mesures_bob.append(received_bob[i]+1)
         sleep(0.01)
         KGM_mesures_alice = Bob.recvClassical()
-        print ("KGM Measures Received: ", list(KGM_mesures_alice))
-        print ("pluto: ", int.from_bytes(KGM_mesures_alice, "big"))
+        KGM_mesures_alice_official = list(KGM_mesures_alice)        #questa è una lista con le misure che ha fatto alice, alla posizione indicata dall'indice.
+        sleep(0.01)
+        index = Bob.recvClassical()
+        indexlist = list(index)                     #indexlist è una lista con gli indici scelti da alice
+        print ("KGM Measures Received: ", KGM_mesures_alice_official)
+        print ("index bob: ", indexlist)
 
 
 

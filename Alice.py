@@ -89,7 +89,7 @@ def preparation_Alice():
                 Alice.sendClassical("Bob", received_alice[i]+1)
             else:
                 KGM_measures_alice.append(received_alice[i]+1)
-        index = np.random.choice(len(KGM_measures_alice),10,replace=False)
+        index = np.random.choice(len(KGM_measures_alice),int(0.1*len(KGM_measures_alice)),replace=False)
         indexlist = list(index)
         print(indexlist)
         i=0
@@ -100,8 +100,8 @@ def preparation_Alice():
 
         print("KGM Measures Sent: ", KGM_measures_alice_official)
         Alice.sendClassical("Bob", KGM_measures_alice_official)
-
-        #Alice.sendClassical("Bob", index)
+        sleep(0.01)
+        Alice.sendClassical("Bob", indexlist)
         #print ("modes of Alice ", modes_alice)
 
 preparation_Alice()
