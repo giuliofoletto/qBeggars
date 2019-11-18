@@ -2,7 +2,7 @@
 The Charlie (source) node for the qBeggar project
 '''
 
-clenght = 100
+clenght = 256
 
 import sys
 from cqc.pythonLib import CQCConnection, qubit

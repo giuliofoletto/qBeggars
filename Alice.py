@@ -26,14 +26,15 @@ received_bob = []
 modes_alice = []
 KGM_measures_alice = []
 KGM_measures_alice_official = []
-
+indexlist = []
 angA_1 = 224
 angA_2 = 32
 
-clenght = 100
+clenght = 256
 
 
 def preparation_Alice():
+    global KGM_measures_alice, indexlist
     with CQCConnection("Alice") as Alice:
         for i in range(clenght):
             q = Alice.recvQubit()
@@ -99,12 +100,44 @@ def preparation_Alice():
             i += 1
 
         print("KGM Measures Sent: ", KGM_measures_alice_official)
+        sleep(0.01)
         Alice.sendClassical("Bob", KGM_measures_alice_official)
         sleep(0.01)
         Alice.sendClassical("Bob", indexlist)
         #print ("modes of Alice ", modes_alice)
 
+def keyReconciliation(sift_key):
+    sleep(0.01)
+    correct_key_size = int.from_bytes(Alice.recvClassical(),'big')
+    print('Alice corrected key size:', correct_key_size)
+    correct_key = sift_key[0:correct_key_size]
+    return correct_key
+
+def privacyAmplification(cor_key):
+    sleep(0.01)
+    secret_key_size =  int.from_bytes(Alice.recvClassical(),'big')
+    secret_key = cor_key[0:secret_key_size]
+    return secret_key
+
 preparation_Alice()
+with CQCConnection("Alice") as Alice:
+
+    sleep(0.01)
+    success = int.from_bytes(Alice.recvClassical(),'big')
+    if success:
+        KGM_measures_alice =  np.array(KGM_measures_alice,dtype=int)
+        mask = np.ones(KGM_measures_alice.size,dtype=bool)
+        mask[indexlist]= 0
+        sifted_key = KGM_measures_alice[mask]//2
+        print('Sifted key Alice: ', sifted_key)
+        correct_key = keyReconciliation(sifted_key)
+        secret_key= privacyAmplification(correct_key)
+        print('The following secret key of ', secret_key.size, 'bits was produced:' )
+        print(secret_key)
+    else: 
+        print('Communication aborted')
+        exit()
+
 
 #INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE
 
@@ -113,9 +146,9 @@ alice = Tk()
 alice.title( "QBeggars - Alice" )
 
 message = StringVar()
-message.set(" ")
+message.set("")
 sent = StringVar()
-sent.set(" ")
+sent.set("")
 
 send_label = Label( alice, text = "Insert a message you want to send securely" )
 send_label.pack()
@@ -125,14 +158,31 @@ entry.pack(fill=X)
 
 #establish QKD and update Bob label
 def QBeggars(s):
-    print("ciò che arriva dalla casella", s)
-    sent_bin_j = ' '.join(format(ord(x), 'b') for x in s)
+    print("Prompted text to send: ", s)
+    to_send_bin_j = ''.join(format(ord(x), 'b') for x in s)
+    print("Text converted in binary: ", ' '.join(format(ord(x), 'b') for x in s))
+    if secret_key.size < len(to_send_bin_j):
+        print('The message is too long to apply OTP with the available key')
+        return
+    else:
+        print("Binary key for OTP: ", secret_key[0:len(to_send_bin_j)])
+        plaintext_bool = np.array(np.array(list(to_send_bin_j),int),bool)
+        #print(plaintext_bool)
+        key_bool = np.array(np.array(list(secret_key[0:len(to_send_bin_j)]),int),bool)
+        #print(key_bool)
+        cyphertext =  np.logical_xor(plaintext_bool, key_bool)
+        #print(cyphertext)
+        cyphertext = list(np.array(cyphertext,int))
+        print("Binary cyphertext: ", cyphertext)
+        char_idx = range(len(to_send_bin_j)//7)
+        sent_bin_j = cyphertext
+        #sent_bin_j = ' '.join(format(ord(cyphertext[7*idx:7*idx+7]), 'b') for idx in char_idx)
+        #print(sent_bin_j)
 
-    print("Stringa da inviare in binario: ", sent_bin_j)
-
-    with CQCConnection("Alice") as Alice:
-        Alice.sendClassical("Bob", sent_bin_j)
-        print("Alice SENT: ", sent_bin_j)
+    
+        with CQCConnection("Alice") as Alice:
+            Alice.sendClassical("Bob", sent_bin_j)
+            print("Alice SENT: ", sent_bin_j)
 
 #update labels and calls QBeggars when 'SEND!' is pressed
 def callback():

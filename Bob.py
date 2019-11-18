@@ -1,5 +1,5 @@
 import sys
-from math import ceil, log, sqrt, copysign
+from math import floor, ceil, log, sqrt, copysign
 from random import randint, random, sample
 from multiprocessing import Pool
 from cqc.pythonLib import CQCConnection, qubit
@@ -8,6 +8,7 @@ import utils
 import numpy as np
 from tkinter import *
 import json
+import struct
 
 
 correct_basis = []
@@ -27,7 +28,7 @@ index = []
 angB_1 = 0
 angB_2 = 64
 
-clenght = 100
+clenght = 256
 
 def preparation_Bob():
     with CQCConnection("Bob") as Bob:
@@ -37,7 +38,7 @@ def preparation_Bob():
             print(i)
             q = Bob.recvQubit()
             sleep(0.01)
-            rnd_mode_choice = int((copysign(1,(random()-p_control_mode))+1)/2) #copysign used to get +1 or -1 but never 0, then we need to turn those into positive values (0 or 1) to send them
+            rnd_mode_choice = int((random() > p_control_mode)) #we need positive values (0 or 1) to send them
             Bob.sendClassical("Alice", rnd_mode_choice)
             modes_bob.append(rnd_mode_choice)
             sleep(0.01)
@@ -82,7 +83,7 @@ def preparation_Bob():
                         received_bob.append(-1)
                     else:
                         print ("Error: measure != {0,1}")
-        KGM_mesures_bob = []
+        global KGM_mesures_bob
         for i in range(clenght):
             if modes_bob[i] == 0:
                 sleep(0.01)
@@ -93,10 +94,11 @@ def preparation_Bob():
                 received_alice.append(Ameasure)
             else:
                 KGM_mesures_bob.append(received_bob[i]+1)
-        sleep(0.01)
-        KGM_mesures_alice = Bob.recvClassical()
+        print('Bob receiving now')
+        global KGM_mesures_alice
+        KGM_mesures_alice = list(bytearray(Bob.recvClassical()))
         KGM_mesures_alice_official = list(KGM_mesures_alice)        #questa è una lista con le misure che ha fatto alice, alla posizione indicata dall'indice.
-        sleep(0.01)
+        global index
         index = Bob.recvClassical()
         indexlist = list(index)                     #indexlist è una lista con gli indici scelti da alice
         print ("KGM Measures Received: ", KGM_mesures_alice_official)
@@ -128,50 +130,43 @@ def preparation_Bob():
 
 
 
-def calculate():
+def calculate_QBER():
     error = 0
-    for i in range(len(received_alice)):
-        if (basis_alice[i] == basis_bob[i]):
-            correct_basis.append(i)
-            correct_keyA.append(received_alice[i])
-            correct_keyB.append(received_bob[i])
-        else:
+    for i in range(len(list(index))):
+        if (KGM_mesures_alice[i] != KGM_mesures_bob[indexlist[i]]):
             error = error + 1
-    print ("Correct Basis: ", correct_basis)
-    print ("Correct Key Alice:", correct_keyA)
-    print ("Correct Key Bob:", correct_keyB)
+    print ("Key Sample Alice:", KGM_mesures_alice)
+    print ("Key Sample Bob:", KGM_mesures_bob[indexlist])
     print ("error: ", error)
-    error_percentage = error/len(received_alice) # maximum value is 1
+    error_percentage = error/len(indexlist) # maximum value is 1
     print("error_percentage: ", error_percentage)
-    size = ceil(sqrt(len(correct_basis)))
-    print ("size: ", size)
     global qber
-    global qber2
-    qber = error_percentage/size # lies btween 0 and 1
+    # global qber2
+    qber = error_percentage # lies btween 0 and 1
     print("qber:", qber)
+    return qber
 
-#def calculate():
- #   error = 0
-  #  for i in range(len(received_bob)):
-   #     if (basis_alice[i] == basis_bob[i]):
-    #        correct_basis.append(i)
-     #       correct_key.append(received[i])
-      #  else:
-  #          error = error + 1
-  #  print ("Correct Basis: ", correct_basis)
-  #  print ("Correct Key :", correct_key)
-  #  print ("error:", error)
-  #  error_percentage = error/len(received) # maximum value is 1
-  #  print("error_percentage", error_percentage)
-  #  size = ceil(sqrt(len(correct_basis)))
-  #  print ("size: ", size)
-  #  global qber
-  #  global qber2
-  #  qber = error_percentage/size # lies btween 0 and 1
-  #  print("qber:", qber)
 
-# def secureKeyRate(x):
-  #  return ((-x)*log(x, 2) - (1-x)*log(1-x, 2))
+def secureKeyRate(s,qber):
+    mutual_info_AB = 1 - utils.h2(qber)
+    Eve_Holevo_bound = utils.holevo(s)
+    secure_key_rate = max(mutual_info_AB - Eve_Holevo_bound, 0) #infinite key length approximation
+    print('Secure key rate: ', secure_key_rate)
+    return secure_key_rate
+
+def keyReconciliation(sift_key,qber): #to be implemented seriously (eg. through Cascade alg. or LDPC code)
+    mutual_info_rate = 1 - utils.h2(qber)
+    correct_key_size = floor(sift_key.size * mutual_info_rate)
+    print('Bob corrected key size:', correct_key_size)
+    corrected_key = sift_key[0:correct_key_size]
+    return corrected_key
+
+def privacyAmplification(sift_key,corr_key,s): #to be implemented seriously through epsilon-universal hash functions (eg. Toeplitz matrices)
+    Eve_info_rate = utils.holevo(s)
+    print(Eve_info_rate)
+    secret_key_length = corr_key.size - ceil(sift_key.size * Eve_info_rate)
+    secret_key = corr_key[0:secret_key_length-1]
+    return secret_key
 
 
 preparation_Bob()
@@ -179,24 +174,63 @@ basis_alice = np.array(basis_alice,dtype=int)
 received_alice = np.array(received_alice,dtype=int)
 basis_bob = np.array(basis_bob,dtype=int)
 received_bob = np.array(received_bob,dtype=int)
-modes_bob = np.array(modes_bob,dtype=int)
+modes_bob = np.array(modes_bob,dtype=int)   
 S=utils.compute_CHSH(basis_alice, received_alice, basis_bob[modes_bob == 0], received_bob[modes_bob == 0])
 print(S)
-
+KGM_mesures_bob = np.array(KGM_mesures_bob,dtype=int)
+indexlist = sorted(list(index))
+QBER = calculate_QBER()
+secret_key_rate= secureKeyRate(S,QBER)
+with CQCConnection("Bob") as Bob:
+    if secret_key_rate == 0:
+        print('The transmission is too disturbed to establish a secret key.')
+        Bob.sendClassical("Alice",0) 
+    else:
+        Bob.sendClassical("Alice",1)
+        sleep(0.01)
+        mask = np.ones(KGM_mesures_bob.size,dtype=bool)
+        mask[indexlist]= 0
+        sifted_key = KGM_mesures_bob[mask]//2
+        print('Sifted key Bob :', sifted_key)
+        correct_key = keyReconciliation(sifted_key,QBER)
+        Bob.sendClassical("Alice",correct_key.size)
+        sleep(0.01)
+        secret_key = privacyAmplification(sifted_key,correct_key,S)
+        Bob.sendClassical("Alice",secret_key.size)
+        print('The following secret key of ', secret_key.size, 'bits was produced:' )
+        print(secret_key)
+    
 
 #INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE INTERFACE
 
 
 with CQCConnection("Bob") as Bob:
-    received_j = Bob.recvClassical(msg_size=10000)
-    measure_outcome = json.loads(received_j.decode('utf-8'))
-    print("FAK")
-    type(measure_outcome)
+    received_j = list(bytearray(Bob.recvClassical(msg_size=10000)))
+    print("Received cyphertext: ", received_j)
+    cyphertext_bool = np.array(np.array(received_j,int),bool)
+    key_bool = np.array(np.array(list(secret_key[0:len(received_j)]),int),bool)
+    #print(key_bool)
+    plaintext_b =  np.logical_xor(cyphertext_bool, key_bool)
+    #print(plaintext_b)
+    plaintext_b = list(np.array(plaintext_b,int))
+    print("Binary plaintext: ", plaintext_b)
+    plaintext=[]
+    for i in range((len(plaintext_b))//7):
+        byte = plaintext_b[7*i:7*(i+1)]
+        print(byte)
+        num=0
+        for j in range(7):
+            num += byte[6-j]*(2**j)
+        print(num,chr(num))
+        plaintext.append(chr(num))
+    plaintext = ''.join(plaintext)
+    print('Decoded text', plaintext)
+    
 
 
 bob = Tk()
 bob.title( "QBeggars - Bob" )
-receive_label = Label( bob, text = "Bob didn't receive anything" )
+receive_label = Label( bob, text = "Cyphered communication from Alice: \n" + plaintext )
 receive_label.pack()
 
 bob.mainloop()

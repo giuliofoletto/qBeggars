@@ -3,6 +3,7 @@ Some python utilities for the qBeggars project
 '''
 
 import numpy as np
+import math
 
 # Compute the CHSH correlation value based on four binary arrays (bases are 0,1 whereas outcomes are +1,-1)
 def compute_CHSH(alice_bases, alice_outcomes, bob_bases, bob_outcomes):
@@ -21,10 +22,14 @@ def compute_CHSH(alice_bases, alice_outcomes, bob_bases, bob_outcomes):
 
 # Compute the binary entropy
 def h2(x):
-    return -1*x*np.log2(x)-(1-x)*np.log2(1-x)
-
+    if (not math.isclose(x,0)) and (not math.isclose(x,1)):
+        return -1*x*np.log2(x)-(1-x)*np.log2(1-x)
+    else:
+        return 0
 # Compute the holevo quantity (see 10.1103/PhysRevLett.98.230501)
 def holevo(s):
+    if s > 2**1.5:
+        s= 2**1.5
     arg = 0.5*(1+np.sqrt((s/2)**2-1))
     return h2(arg)
 
